@@ -3,7 +3,9 @@ ARG BUILD_VERSION
 
 FROM $BASE_IMAGE
 
+LABEL maintainer="dev@ujar.org"
 ENV APPLICATION_BUILD_VERSION=$BUILD_VERSION
+
 WORKDIR /opt/app
 
 COPY ./target/*.jar /opt/app/app.jar

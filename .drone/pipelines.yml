@@ -28,7 +28,6 @@ steps :
         from_secret : DEPLOYER_PASSWORD
     commands :
       - mvn -version
-      - printenv
       - mvn dependency:resolve -s ../maven-settings.xml -Ddeployer.username=$DEPLOYER_USERNAME -Ddeployer.password=$DEPLOYER_PASSWORD
       - mvn clean verify -Dstyle.color=always -Dmaven.javadoc.skip=true -s ../maven-settings.xml -Ddeployer.username=$DEPLOYER_USERNAME -Ddeployer.password=$DEPLOYER_PASSWORD
 
@@ -187,8 +186,7 @@ steps :
         - BASE_IMAGE=docker-registry.continuousdelivery.store/jre:ibm-semeru-runtimes-open-17-jre-focal
         - BUILD_VERSION=${DRONE_COMMIT}
       tags :
-        - ${DRONE_BRANCH:22}
-        - ${DRONE_COMMIT}
+        - ${DRONE_BRANCH:22}-${CI_BUILD_NUMBER}
     when :
       branch :
         include :

@@ -1,57 +1,37 @@
-<configuration>
-    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                pattern="%style{%d{ISO8601}}{black} %highlight{%-5level }[%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable" />
+        </Console>
 
-    <springProperty name="feature" source="spring.application.name"/>
-    <springProperty name="application_name" source="spring.application.name"/>
+        <RollingFile name="RollingFile"
+            fileName="./logs/spring-boot-logger-log4j2.log"
+            filePattern="./logs/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <pattern>%d %p %C{1.} [%t] %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <!-- rollover on startup, daily and when the file reaches 
+                    10 MegaBytes -->
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy
+                    size="10 MB" />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+    </Appenders>
 
-    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+    <Loggers>
+        <!-- LOG everything at INFO level -->
+        <Root level="info">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+        </Root>
 
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>${application_name} %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%X{transactionId},%X{traceId:-},%X{spanId:-}]){blue}[%thread] %clr(%-5level)
-                %clr(%logger{36}){magenta} - %msg%n
-            </pattern>
-        </encoder>
-    </appender>
+        <!-- LOG "org.ujar*" at TRACE level -->
+        <Logger name="org.ujar" level="trace" />
+    </Loggers>
 
-    <appender name="CONSOLE_JSON" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp>
-                    <fieldName>log_timestamp</fieldName>
-                    <timeZone>UTC</timeZone>
-                </timestamp>
-                <pattern>
-                    <pattern>
-                        {
-                        "env": "${ENV}",
-                        "feature": "${feature}",
-                        "level": "%level",
-                        "thread": "%thread",
-                        "logger": "%logger",
-                        "class": "%class",
-                        "message": "%message",
-                        "method": "%method",
-                        "line": "%line",
-                        "hostname": "${HOSTNAME}",
-                        "trace_id":"%X{dd.trace_id:-0}",
-                        "span_id": "%X{dd.span_id:-0}",
-                        "data_privacy":"%X{private:-0}"
-                        }
-                    </pattern>
-                </pattern>
-                <stackTrace>
-                    <fieldName>exception</fieldName>
-                    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
-                        <maxDepthPerThrowable>30</maxDepthPerThrowable>
-                        <maxLength>1024</maxLength>
-                        <rootCauseFirst>true</rootCauseFirst>
-                    </throwableConverter>
-                </stackTrace>
-            </providers>
-        </encoder>
-    </appender>
-    <root level="INFO">
-        <appender-ref ref="${LOGBACK_APPENDER:-CONSOLE}"/>
-    </root>
-</configuration>
+</Configuration>

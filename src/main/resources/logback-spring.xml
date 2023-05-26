@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <springProperty name="application_name" source="spring.application.name"/>
 
-    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
 
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
-        <batchTimeoutMs>1000</batchTimeoutMs>
+        <batchTimeoutMs>10000</batchTimeoutMs>
         <http>
             <url>${LOKI_URL:-http://localhost:3100/loki/api/v1/push}</url>
         </http>
         <format>
             <label>
-                <pattern>application=${application_name},host=${HOSTNAME},level=%level</pattern>
+                <pattern>application=${application_name},host=${HOSTNAME},traceID=%X{traceId:-NONE},level=%level</pattern>
             </label>
             <message>
                 <pattern>${FILE_LOG_PATTERN}</pattern>
@@ -38,11 +38,12 @@
                     <pattern>
                         {
                         "application": "${application_name}",
+                        "traceID": "%X{traceId:-NONE}",
+                        "message": "%message",
                         "level": "%level",
                         "thread": "%thread",
                         "logger": "%logger",
                         "class": "%class",
-                        "message": "%message",
                         "method": "%method",
                         "line": "%line",
                         "hostname": "${HOSTNAME}"
@@ -61,21 +62,8 @@
         </encoder>
     </appender>
 
-    <!-- Use Spring Boot default appender for local development -->
-    <springProfile name="default">
-        <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
-        </root>
-    </springProfile>
-    <!-- Use Logstash JSON appender when running in Kubernetes Pod -->
-    <springProfile name="!default">
-        <root level="INFO">
-            <appender-ref ref="CONSOLE_JSON"/>
-        </root>
-    </springProfile>
-    <springProfile name="loki">
-        <root level="INFO">
-            <appender-ref ref="LOKI"/>
-        </root>
-    </springProfile>
+    <root level="INFO">
+        <appender-ref ref="${LOGBACK_APPENDER:-CONSOLE_JSON}"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
 </configuration>

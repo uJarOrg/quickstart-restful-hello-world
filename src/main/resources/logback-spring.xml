@@ -12,10 +12,10 @@
         </http>
         <format>
             <label>
-                <pattern>application=${application_name},host=${HOSTNAME},traceID=%X{traceId:-NONE},level=%level,namespace_name=${NAMESCAPE_NAME},pod_name=${POD_NAME}</pattern>
+                <pattern>application=${application_name},host=${HOSTNAME},traceID=%X{traceId:-NONE},level=%level</pattern>
             </label>
             <message>
-                <pattern>{"message": "%msg", "ex": "%ex", "c": "%logger{20}", "thread": "%thread"}</pattern>
+                <pattern>{"message": "%msg", "logger": "%logger{20}", "thread": "%thread"}</pattern>
             </message>
             <sortByTime>true</sortByTime>
         </format>

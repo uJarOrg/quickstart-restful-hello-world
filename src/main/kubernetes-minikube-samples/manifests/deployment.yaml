@@ -25,11 +25,6 @@ spec :
               containerPort : 8080
               hostPort : 8080
           env :
-            - name : SWAGGER_UI_RELATIVE_PATH
-              valueFrom :
-                configMapKeyRef :
-                  name : hello-world
-                  key : swagger-ui-relative-path
             - name : LOGGING_LEVEL_ROOT
               valueFrom :
                 configMapKeyRef :
